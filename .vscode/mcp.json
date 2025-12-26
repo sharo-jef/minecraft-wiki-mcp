@@ -2,9 +2,7 @@
 	"servers": {
 		"minecraft-wiki-mcp-debug": {
 			"command": "npm",
-			"args": [
-				"start",
-			],
-		},
+			"args": ["start"]
+		}
 	},
 }
