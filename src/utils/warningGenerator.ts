@@ -40,7 +40,7 @@ export function generateWarnings(
 	// Add source information for Wiki-sourced data
 	if (source === "wiki" && isKnownVersion) {
 		warnings.push(
-			`ℹ️ Version info retrieved from Minecraft Wiki (development version).`,
+			"ℹ️ Version info retrieved from Minecraft Wiki (development version).",
 			"Verify this is accurate for your specific snapshot/pre-release build.",
 		);
 	}

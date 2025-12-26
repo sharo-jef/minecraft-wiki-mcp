@@ -14,6 +14,30 @@ export interface PackMcmeta {
 	};
 }
 
+export function isValidNamespace(namespace: string): boolean {
+	// Minecraft namespace rules:
+	// - Must be lowercase letters, numbers, underscores, hyphens, or dots
+	// - Cannot have multiple consecutive special characters
+	// - Cannot start with a number
+	const namespacePattern = /^[a-z][a-z0-9_.-]*$/;
+	const noConsecutiveSpecial = /^(?!.*[_.-]{2})[a-z][a-z0-9_.-]*$/;
+
+	return (
+		namespace.length > 0 &&
+		namespacePattern.test(namespace) &&
+		noConsecutiveSpecial.test(namespace)
+	);
+}
+
+export class InvalidNamespaceError extends Error {
+	constructor(namespace: string) {
+		super(
+			`Invalid namespace: "${namespace}". Namespace must contain only lowercase letters, numbers, underscores, hyphens, and dots.`,
+		);
+		this.name = "InvalidNamespaceError";
+	}
+}
+
 export interface DirectoryStructure {
 	data: {
 		[namespace: string]: {

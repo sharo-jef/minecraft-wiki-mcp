@@ -8,6 +8,15 @@ let wikiPackFormatCache: Map<string, PackFormatMapping> | null = null;
 let wikiCacheTimestamp = 0;
 const CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour
 
+/**
+ * Clear the Wiki pack format cache (used for testing)
+ * @internal
+ */
+export function clearWikiCache(): void {
+	wikiPackFormatCache = null;
+	wikiCacheTimestamp = 0;
+}
+
 export const KNOWN_PACK_FORMATS: PackFormatMapping[] = [
 	{
 		packFormat: [94, 1],
@@ -362,7 +371,7 @@ async function parseWikiPackFormats(): Promise<Map<string, PackFormatMapping>> {
 						// Format like "88.0" -> [88, 0]
 						const parts = packFormatStr
 							.split(".")
-							.map((p) => parseInt(p.trim(), 10));
+							.map((p) => Number.parseInt(p.trim(), 10));
 						if (
 							parts.length === 2 &&
 							!Number.isNaN(parts[0]) &&
@@ -373,7 +382,7 @@ async function parseWikiPackFormats(): Promise<Map<string, PackFormatMapping>> {
 							return; // Skip invalid format
 						}
 					} else {
-						const num = parseInt(packFormatStr.trim(), 10);
+						const num = Number.parseInt(packFormatStr.trim(), 10);
 						if (Number.isNaN(num)) return; // Skip non-numeric
 						packFormat = num;
 					}
@@ -412,7 +421,10 @@ async function parseWikiPackFormats(): Promise<Map<string, PackFormatMapping>> {
 						const match = v.match(/^(\d+)\.(\d+)/);
 						if (!match) return false;
 						const [, major, minor] = match;
-						return parseInt(major, 10) === 1 && parseInt(minor, 10) >= 21;
+						return (
+							Number.parseInt(major, 10) === 1 &&
+							Number.parseInt(minor, 10) >= 21
+						);
 					});
 					const directoryNaming: "singular" | "plural" = hasPost121
 						? "singular"

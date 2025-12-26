@@ -20,8 +20,8 @@ export function extractJsonBlocks(wikitext: string): unknown[] {
 
 export function stripHtml(html: string): string {
 	return html
-		.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-		.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+		.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, " ")
+		.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ")
 		.replace(/<[^>]+>/g, "")
 		.replace(/&nbsp;/g, " ")
 		.replace(/&lt;/g, "<")
@@ -29,5 +29,6 @@ export function stripHtml(html: string): string {
 		.replace(/&amp;/g, "&")
 		.replace(/&quot;/g, '"')
 		.replace(/&#039;/g, "'")
+		.replace(/\s+/g, " ")
 		.trim();
 }

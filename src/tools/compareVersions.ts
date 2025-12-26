@@ -275,9 +275,7 @@ export async function compareVersions(
 	};
 
 	if (!rev1 && !rev2) {
-		output.summary =
-			`No revisions found matching version patterns "${version1}" or "${version2}". ` +
-			"Try using search_page_revisions to find available version-related revisions.";
+		output.summary = `No revisions found matching version patterns "${version1}" or "${version2}". Try using search_page_revisions to find available version-related revisions.`;
 		return {
 			content: [
 				{

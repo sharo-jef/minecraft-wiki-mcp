@@ -25,7 +25,7 @@ export function generateDatapackFiles(
 		packMcmeta.pack.pack_format = packFormat;
 	}
 
-	if (description) {
+	if (description !== undefined && description !== null) {
 		packMcmeta.pack.description = description;
 	}
 

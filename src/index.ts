@@ -6,6 +6,7 @@ import {
 	ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
+import { clearWikiCache } from "./tools/clearWikiCache.js";
 import { compareVersions } from "./tools/compareVersions.js";
 import { createDatapackStructure } from "./tools/createDatapackStructure.js";
 import { getPackFormatInfo } from "./tools/getPackFormatInfo.js";
@@ -225,6 +226,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 					required: ["title", "version1", "version2"],
 				},
 			},
+			{
+				name: "clear_wiki_cache",
+				description:
+					"Clear the internal Wiki pack format cache. " +
+					"Use this when you suspect cached data is stale or incorrect, " +
+					"or when debugging issues with pack format lookups. " +
+					"The cache will be automatically rebuilt on the next Wiki query.",
+				inputSchema: {
+					type: "object",
+					properties: {},
+				},
+			},
 		],
 	};
 });
@@ -287,6 +300,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 						version2: string;
 					},
 				);
+			case "clear_wiki_cache":
+				return await clearWikiCache();
 			default:
 				throw new Error(`Unknown tool: ${name}`);
 		}

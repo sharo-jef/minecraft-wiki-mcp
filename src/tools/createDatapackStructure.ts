@@ -97,7 +97,7 @@ export async function createDatapackStructure(
 	);
 
 	// Get feature directories (for documentation purposes)
-	const directories = getFeatureDirectories(
+	const _directories = getFeatureDirectories(
 		namespace,
 		features,
 		mapping.directoryNaming,
