@@ -5,11 +5,15 @@ import {
 	getFeatureDirectories,
 } from "../utils/fileGenerator.js";
 import { generatePackMcmetaSchema } from "../utils/schemaGenerator.js";
-import { getPackFormatWithFallback } from "../utils/versionMapping.js";
+import {
+	getPackFormatWithFallback,
+	KNOWN_PACK_FORMATS,
+} from "../utils/versionMapping.js";
 import { generateWarnings } from "../utils/warningGenerator.js";
 
 interface CreateDatapackStructureArgs {
-	minecraftVersion: string;
+	minecraftVersion?: string;
+	packFormat?: number;
 	namespace: string;
 	description?: string;
 	features?: string[];
@@ -21,6 +25,7 @@ export async function createDatapackStructure(
 ): Promise<CallToolResult> {
 	const {
 		minecraftVersion,
+		packFormat,
 		namespace,
 		description,
 		features = ["functions"],
@@ -28,8 +33,8 @@ export async function createDatapackStructure(
 	} = args;
 
 	// Validate required arguments
-	if (!minecraftVersion) {
-		throw new Error("minecraftVersion is required");
+	if (!minecraftVersion && !packFormat) {
+		throw new Error("Either minecraftVersion or packFormat is required");
 	}
 	if (!namespace) {
 		throw new Error("namespace is required");
@@ -42,9 +47,29 @@ export async function createDatapackStructure(
 		);
 	}
 
+	// Determine minecraft version from packFormat if needed
+	let resolvedMinecraftVersion = minecraftVersion;
+	if (!resolvedMinecraftVersion && packFormat) {
+		const packFormatMapping = KNOWN_PACK_FORMATS.find(
+			(pf) => pf.packFormat === packFormat,
+		);
+		if (!packFormatMapping) {
+			throw new Error(
+				`Unknown pack format: ${packFormat}. Use get_pack_format_info to see available formats.`,
+			);
+		}
+		// Use the first (usually latest) version for this pack format
+		resolvedMinecraftVersion = packFormatMapping.minecraftVersions[0];
+	}
+
+	// This should never happen due to validation above, but TypeScript doesn't know that
+	if (!resolvedMinecraftVersion) {
+		throw new Error("Either minecraftVersion or packFormat is required");
+	}
+
 	// Get pack format with fallback for unknown versions
 	const { mapping, isKnown, latestKnownVersion, normalizedVersion, source } =
-		await getPackFormatWithFallback(minecraftVersion);
+		await getPackFormatWithFallback(resolvedMinecraftVersion);
 
 	// Generate pack.mcmeta schema
 	const packMcmetaSchema = generatePackMcmetaSchema(
@@ -85,27 +110,11 @@ export async function createDatapackStructure(
 		warnings,
 	};
 
-	// Add metadata comment
-	const metadata = {
-		...output,
-		_metadata: {
-			minecraft_version: normalizedVersion,
-			pack_format: Array.isArray(mapping.packFormat)
-				? mapping.packFormat.join(".")
-				: mapping.packFormat,
-			namespace,
-			features,
-			directories,
-			is_known_version: isKnown,
-			source, // "hardcoded", "wiki", or "fallback"
-		},
-	};
-
 	return {
 		content: [
 			{
 				type: "text",
-				text: JSON.stringify(metadata, null, 2),
+				text: JSON.stringify(output, null, 2),
 			},
 		],
 	};

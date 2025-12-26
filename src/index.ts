@@ -31,16 +31,23 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 			{
 				name: "create_datapack_structure",
 				description:
-					"Generate pack.mcmeta and correct directory structure for a specific Minecraft version. " +
+					"Generate pack.mcmeta and correct directory structure for a specific Minecraft version or pack format. " +
 					"Uses version-appropriate pack_format and directory naming (singular for 1.21+, plural for older versions). " +
 					"Returns file contents, JSON schema for pack.mcmeta, and version-specific warnings. " +
-					"REQUIRED: minecraftVersion (e.g., '1.21.2', '1.20.5') and namespace (e.g., 'my_datapack').",
+					"REQUIRED: Either minecraftVersion (e.g., '1.21.2', '1.20.5') OR packFormat (e.g., 48, 57), and namespace (e.g., 'my_datapack'). " +
+					"If you only know the pack format number, use packFormat parameter instead of minecraftVersion.",
 				inputSchema: {
 					type: "object",
 					properties: {
 						minecraftVersion: {
 							type: "string",
-							description: "Minecraft version (e.g., '1.21.2', '1.20.5')",
+							description:
+								"Minecraft version (e.g., '1.21.2', '1.20.5'). Either this or packFormat is required.",
+						},
+						packFormat: {
+							type: "number",
+							description:
+								"Pack format number (e.g., 48, 57). Either this or minecraftVersion is required. Use get_pack_format_info to see available formats.",
 						},
 						namespace: {
 							type: "string",
@@ -64,13 +71,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 								"Include load.json and init.mcfunction setup files (default: false)",
 						},
 					},
-					required: ["minecraftVersion", "namespace"],
+					required: ["namespace"],
 				},
 			},
 			{
 				name: "get_wiki_page",
 				description:
-					"Get Minecraft Wiki page content. Can retrieve the latest version or a specific revision. " +
+					"Get Minecraft Wiki page content. " +
+					"IMPORTANT: Requires exact page title. Use search_wiki_page first to find the correct page title. " +
+					"Can retrieve the latest version or a specific revision. " +
 					"Optionally extracts JSON code blocks from the page. Useful for getting JSON format specifications.",
 				inputSchema: {
 					type: "object",
@@ -108,6 +117,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 				name: "search_page_revisions",
 				description:
 					"Search a page's edit history for revisions related to specific Minecraft versions. " +
+					"IMPORTANT: Requires exact page title. Use search_wiki_page first to find the correct page title. " +
 					"Useful for finding when page content was updated for a particular version. " +
 					"Can filter by version pattern in edit comments and date range.",
 				inputSchema: {
@@ -190,6 +200,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 				name: "compare_versions",
 				description:
 					"Compare JSON format changes between two Minecraft versions on a Wiki page. " +
+					"IMPORTANT: Requires exact page title. Use search_wiki_page first to find the correct page title. " +
 					"Searches page revisions for version-related edits, retrieves content from both versions, " +
 					"and generates a diff of JSON blocks. Useful for understanding format changes during version migrations.",
 				inputSchema: {
