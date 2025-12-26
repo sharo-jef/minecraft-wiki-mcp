@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getTextContent } from "./test-utils.js";
 
 /**
  * Integration tests for MCP tools
@@ -19,7 +20,7 @@ describe("MCP Tools Integration", () => {
 			});
 
 			expect(result.content).toHaveLength(1);
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 
 			// Verify pack.mcmeta
 			expect(content.files["pack.mcmeta"]).toBeDefined();
@@ -42,7 +43,7 @@ describe("MCP Tools Integration", () => {
 				namespace: "test_pack",
 			});
 
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(content.files["pack.mcmeta"].pack.pack_format).toBe(48);
 		});
 
@@ -58,7 +59,7 @@ describe("MCP Tools Integration", () => {
 				includeLoadSetup: true,
 			});
 
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(
 				content.files["data/minecraft/tag/function/load.json"],
 			).toBeDefined();
@@ -78,7 +79,7 @@ describe("MCP Tools Integration", () => {
 				minecraftVersion: "1.21.2",
 			});
 
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(content.packFormat).toBe(57);
 			expect(content.directoryNaming).toBe("singular");
 		});
@@ -92,7 +93,7 @@ describe("MCP Tools Integration", () => {
 				packFormat: 48,
 			});
 
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(content.minecraftVersions).toContain("1.21");
 		});
 	});

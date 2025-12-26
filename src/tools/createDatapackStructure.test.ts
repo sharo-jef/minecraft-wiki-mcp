@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getTextContent } from "../test-utils.js";
 import type { PackFormatMapping } from "../types.js";
 import { createDatapackStructure } from "./createDatapackStructure.js";
 
@@ -112,7 +113,7 @@ describe("createDatapackStructure", () => {
 		});
 
 		expect(result.content).toHaveLength(1);
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 
 		expect(content.files["pack.mcmeta"]).toBeDefined();
 		expect(content.files["pack.mcmeta"].pack.pack_format).toBe(48);
@@ -135,7 +136,7 @@ describe("createDatapackStructure", () => {
 			namespace: "test",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.files["pack.mcmeta"].pack.min_format).toEqual([88, 0]);
 		expect(content.files["pack.mcmeta"].pack.max_format).toEqual([88, 0]);
 		expect(content.files["pack.mcmeta"].pack.pack_format).toBeUndefined();
@@ -160,7 +161,7 @@ describe("createDatapackStructure", () => {
 			includeLoadSetup: true,
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(
 			content.files["data/minecraft/tag/function/load.json"],
 		).toBeDefined();
@@ -185,7 +186,7 @@ describe("createDatapackStructure", () => {
 			namespace: "test",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.packMcmetaSchema).toBeDefined();
 		expect(content.packMcmetaSchema.$schema).toBe(
 			"http://json-schema.org/draft-07/schema#",
@@ -208,7 +209,7 @@ describe("createDatapackStructure", () => {
 			namespace: "test",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.warnings).toBeDefined();
 		expect(Array.isArray(content.warnings)).toBe(true);
 	});
@@ -230,7 +231,7 @@ describe("createDatapackStructure", () => {
 			namespace: "test",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.warnings.join("\n")).toContain("UNKNOWN VERSION");
 		expect(content.warnings.join("\n")).toContain("1.99.99");
 	});
@@ -281,7 +282,7 @@ describe("createDatapackStructure", () => {
 		});
 
 		expect(result.content).toHaveLength(1);
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.files["pack.mcmeta"]).toBeDefined();
 	});
 

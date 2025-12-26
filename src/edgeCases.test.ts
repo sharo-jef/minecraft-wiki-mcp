@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getTextContent } from "./test-utils.js";
 
 // Mock dependencies
 vi.mock("./api/mediawiki.js", () => ({
@@ -242,7 +243,7 @@ describe("Edge Cases", () => {
 			);
 
 			const result = await getPackFormatInfo({ packFormat: 0 });
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(content.error).toBeDefined();
 		});
 
@@ -252,7 +253,7 @@ describe("Edge Cases", () => {
 			);
 
 			const result = await getPackFormatInfo({ packFormat: -1 });
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(content.error).toBeDefined();
 		});
 
@@ -262,7 +263,7 @@ describe("Edge Cases", () => {
 			);
 
 			const result = await getPackFormatInfo({ packFormat: 99999 });
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(content.error).toBeDefined();
 		});
 	});
@@ -371,7 +372,7 @@ describe("Edge Cases", () => {
 				description: longDesc,
 			});
 
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(content.files["pack.mcmeta"].pack.description).toBe(longDesc);
 		});
 	});
@@ -401,7 +402,7 @@ describe("Edge Cases", () => {
 				limit: 0,
 			});
 
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(content.revisions).toEqual([]);
 		});
 
@@ -436,7 +437,7 @@ describe("Edge Cases", () => {
 			});
 
 			// Empty pattern should match all revisions
-			const content = JSON.parse(result.content[0].text);
+			const content = JSON.parse(getTextContent(result));
 			expect(content.filtered).toBe(false);
 		});
 	});

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getTextContent } from "../test-utils.js";
 import { compareVersions } from "./compareVersions.js";
 
 // Mock dependencies
@@ -108,7 +109,7 @@ describe("compareVersions", () => {
 			version2: "1.21",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.version1.revision).toBeDefined();
 		expect(content.version2.revision).toBeDefined();
 		expect(content.version1.revision.revisionId).toBe(1000);
@@ -168,7 +169,7 @@ describe("compareVersions", () => {
 			version2: "1.21",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.jsonDiffs).toBeDefined();
 		expect(content.summary).toBeDefined();
 	});
@@ -201,7 +202,7 @@ describe("compareVersions", () => {
 			version2: "2.00",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.version1.revision).toBeNull();
 		expect(content.version2.revision).toBeNull();
 	});
@@ -226,7 +227,7 @@ describe("compareVersions", () => {
 			version2: "1.21",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.version1.revision).toBeNull();
 		expect(content.version2.revision).toBeNull();
 	});
@@ -259,7 +260,7 @@ describe("compareVersions", () => {
 			version2: "1\\.21\\.",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.version1.pattern).toBe("1\\.20\\.");
 		expect(content.version1.revision).toBeDefined();
 	});
@@ -329,7 +330,7 @@ describe("compareVersions", () => {
 			version2: "1.21",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.jsonDiffs).toEqual([]);
 		expect(content.summary).toContain("No JSON format changes");
 	});

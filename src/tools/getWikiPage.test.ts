@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getTextContent } from "../test-utils.js";
 import { PageNotFoundError } from "../types.js";
 import { getWikiPage } from "./getWikiPage.js";
 
@@ -42,7 +43,7 @@ describe("getWikiPage", () => {
 
 		const result = await getWikiPage({ title: "Data pack" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.title).toBe("Data pack");
 		expect(content.pageId).toBe(12345);
 		expect(content.revisionId).toBe(67890);
@@ -63,7 +64,7 @@ describe("getWikiPage", () => {
 
 		const result = await getWikiPage({ title: "Recipe", extractJson: true });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.jsonBlocks).toBeDefined();
 		expect(content.jsonBlocks).toHaveLength(1);
 		expect(content.jsonBlocks[0]).toEqual({ test: true });
@@ -83,7 +84,7 @@ describe("getWikiPage", () => {
 
 		const result = await getWikiPage({ title: "Test", extractJson: false });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.jsonBlocks).toBeUndefined();
 	});
 
@@ -131,7 +132,7 @@ describe("getWikiPage", () => {
 
 		const result = await getWikiPage({ title: "Test", revisionId: 999 });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.error).toContain("Revision 999 not found");
 		expect(content.suggestion.nearestRevision).toBe(1000);
 	});
@@ -149,7 +150,7 @@ describe("getWikiPage", () => {
 
 		const result = await getWikiPage({ title: "Datapack" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.error).toContain('Page "Datapack" not found');
 		expect(content.suggestions).toContain("Data pack");
 		expect(content.suggestions).toContain("Resource pack");
@@ -181,7 +182,7 @@ describe("getWikiPage", () => {
 
 		const result = await getWikiPage({ title: "Test", format: "wikitext" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.content).toBe("== Heading ==\nContent");
 	});
 
@@ -199,7 +200,7 @@ describe("getWikiPage", () => {
 
 		const result = await getWikiPage({ title: "Test", format: "html" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.content).toBe("<h2>Heading</h2><p>Content</p>");
 	});
 
@@ -217,7 +218,7 @@ describe("getWikiPage", () => {
 
 		const result = await getWikiPage({ title: "Test", format: "plain" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.content).not.toContain("<");
 		expect(content.content).toContain("Heading");
 		expect(content.content).toContain("Content");
@@ -284,7 +285,7 @@ describe("getWikiPage", () => {
 
 		const result = await getWikiPage({ title: "Test", extractJson: false });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.jsonBlocks).toBeUndefined();
 		expect(content.content).toBeDefined();
 	});

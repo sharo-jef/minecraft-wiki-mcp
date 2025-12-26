@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getTextContent } from "../test-utils.js";
 import { searchWikiPage } from "./searchWikiPage.js";
 
 // Mock dependencies
@@ -38,7 +39,7 @@ describe("searchWikiPage", () => {
 
 		const result = await searchWikiPage({ query: "pack" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.query).toBe("pack");
 		expect(content.resultCount).toBe(2);
 		expect(content.results).toHaveLength(2);
@@ -62,7 +63,7 @@ describe("searchWikiPage", () => {
 
 		const result = await searchWikiPage({ query: "test" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.results[0].snippet).toBe("Text with HTML tags");
 		expect(content.results[0].snippet).not.toContain("<");
 	});
@@ -140,7 +141,7 @@ describe("searchWikiPage", () => {
 
 		const result = await searchWikiPage({ query: "nonexistent" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.resultCount).toBe(0);
 		expect(content.results).toEqual([]);
 	});
@@ -151,7 +152,7 @@ describe("searchWikiPage", () => {
 
 		const result = await searchWikiPage({ query: "test" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.results).toEqual([]);
 	});
 
@@ -163,7 +164,7 @@ describe("searchWikiPage", () => {
 
 		const result = await searchWikiPage({ query: "minecraft" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.query).toBe("minecraft");
 	});
 });

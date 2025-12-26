@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getTextContent } from "../test-utils.js";
 import { getPackFormatInfo } from "./getPackFormatInfo.js";
 
 // Mock dependencies
@@ -18,7 +19,7 @@ describe("getPackFormatInfo", () => {
 	it("should require either minecraftVersion or packFormat", async () => {
 		const result = await getPackFormatInfo({});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.error).toContain(
 			"Either minecraftVersion or packFormat is required",
 		);
@@ -30,7 +31,7 @@ describe("getPackFormatInfo", () => {
 			minecraftVersion: "1.21.2",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.packFormat).toBe(57);
 		expect(content.minecraftVersions).toContain("1.21.2");
 		expect(content.directoryNaming).toBe("singular");
@@ -42,7 +43,7 @@ describe("getPackFormatInfo", () => {
 			packFormat: 48,
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.packFormat).toBe(48);
 		expect(content.minecraftVersions).toContain("1.21");
 		expect(content.directoryNaming).toBe("singular");
@@ -53,7 +54,7 @@ describe("getPackFormatInfo", () => {
 			minecraftVersion: "1.99.99",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.error).toBeDefined();
 		expect(content.error).toContain("Unknown");
 		expect(content.suggestion).toContain("get_wiki_page");
@@ -65,7 +66,7 @@ describe("getPackFormatInfo", () => {
 			packFormat: 9999,
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.error).toBeDefined();
 		expect(content.knownPackFormats).toBeDefined();
 	});
@@ -75,7 +76,7 @@ describe("getPackFormatInfo", () => {
 			minecraftVersion: "1.21.0",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.packFormat).toBe(48);
 		expect(content.minecraftVersions).toContain("1.21");
 	});
@@ -85,7 +86,7 @@ describe("getPackFormatInfo", () => {
 			minecraftVersion: "1.20.5",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.directoryNaming).toBe("plural");
 	});
 
@@ -94,7 +95,7 @@ describe("getPackFormatInfo", () => {
 			minecraftVersion: "1.21.9",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.packFormat).toEqual([88, 0]);
 		expect(content.usesMinMaxFormat).toBe(true);
 	});
@@ -104,7 +105,7 @@ describe("getPackFormatInfo", () => {
 			minecraftVersion: "unknown",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.knownPackFormats).toBeDefined();
 		expect(Array.isArray(content.knownPackFormats)).toBe(true);
 		expect(content.knownPackFormats.length).toBeGreaterThan(0);
@@ -118,8 +119,8 @@ describe("getPackFormatInfo", () => {
 			minecraftVersion: "1.21.1",
 		});
 
-		const content1 = JSON.parse(result1.content[0].text);
-		const content2 = JSON.parse(result2.content[0].text);
+		const content1 = JSON.parse(getTextContent(result1));
+		const content2 = JSON.parse(getTextContent(result2));
 
 		expect(content1.packFormat).toBe(content2.packFormat);
 		expect(content1.packFormat).toBe(48);

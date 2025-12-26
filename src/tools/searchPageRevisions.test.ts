@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getTextContent } from "../test-utils.js";
 import { PageNotFoundError } from "../types.js";
 import { searchPageRevisions } from "./searchPageRevisions.js";
 
@@ -55,7 +56,7 @@ describe("searchPageRevisions", () => {
 
 		const result = await searchPageRevisions({ title: "Pack format" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.title).toBe("Pack format");
 		expect(content.revisions).toHaveLength(2);
 		expect(content.revisions[0].revisionId).toBe(1000);
@@ -99,7 +100,7 @@ describe("searchPageRevisions", () => {
 			versionPattern: "1.21",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.revisions).toHaveLength(1);
 		expect(content.revisions[0].comment).toContain("1.21");
 		expect(content.filtered).toBe(true);
@@ -143,7 +144,7 @@ describe("searchPageRevisions", () => {
 			versionPattern: "1\\.(20|21)",
 		});
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.revisions).toHaveLength(2);
 	});
 
@@ -170,7 +171,7 @@ describe("searchPageRevisions", () => {
 
 		const result = await searchPageRevisions({ title: "Test", limit: 10 });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.revisions).toHaveLength(10);
 	});
 
@@ -257,7 +258,7 @@ describe("searchPageRevisions", () => {
 
 		const result = await searchPageRevisions({ title: "Test" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.revisions).toEqual([]);
 		expect(content.totalFound).toBe(0);
 	});
@@ -284,7 +285,7 @@ describe("searchPageRevisions", () => {
 
 		const result = await searchPageRevisions({ title: "Test" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.revisions[0].comment).toBe("");
 	});
 
@@ -311,7 +312,7 @@ describe("searchPageRevisions", () => {
 
 		const result = await searchPageRevisions({ title: "Test" });
 
-		const content = JSON.parse(result.content[0].text);
+		const content = JSON.parse(getTextContent(result));
 		expect(content.filtered).toBe(false);
 	});
 
