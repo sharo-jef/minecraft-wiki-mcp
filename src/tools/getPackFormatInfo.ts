@@ -76,6 +76,8 @@ interface PackFormatInfoOutput {
 	directoryNaming: "singular" | "plural";
 	usesMinMaxFormat: boolean;
 	changes?: string;
+	warning: string;
+	recommendedNextStep: string;
 }
 
 export async function getPackFormatInfo(
@@ -124,6 +126,9 @@ export async function getPackFormatInfo(
 				minecraftVersions: mapping.minecraftVersions,
 				directoryNaming: mapping.directoryNaming,
 				usesMinMaxFormat: mapping.usesMinMaxFormat,
+				warning:
+					"⚠️ This is low-level information only. Use get_datapack_specification to get complete pack.mcmeta format, directory structure, and validation schema.",
+				recommendedNextStep: "get_datapack_specification",
 			};
 		}
 	} else if (packFormat !== undefined) {
@@ -136,6 +141,9 @@ export async function getPackFormatInfo(
 				minecraftVersions: mapping.minecraftVersions,
 				directoryNaming: mapping.directoryNaming,
 				usesMinMaxFormat: mapping.usesMinMaxFormat,
+				warning:
+					"⚠️ This is low-level information only. Use get_datapack_specification to get complete pack.mcmeta format, directory structure, and validation schema.",
+				recommendedNextStep: "get_datapack_specification",
 			};
 		}
 	}
