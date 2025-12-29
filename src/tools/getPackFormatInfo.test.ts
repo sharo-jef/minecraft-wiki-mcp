@@ -73,6 +73,56 @@ describe("getPackFormatInfo", () => {
 		expect(content.knownPackFormats).toBeDefined();
 	});
 
+	it("should convert decimal pack format to array", async () => {
+		const result = await getPackFormatInfo({
+			packFormat: 94.1,
+		});
+
+		const content = JSON.parse(getTextContent(result));
+		expect(content.packFormat).toEqual([94, 1]);
+		expect(content.usesMinMaxFormat).toBe(true);
+	});
+
+	it("should return cached result when cache hit", async () => {
+		const cache = (await import("../utils/cache.js")).cache;
+
+		// First call to populate cache
+		await getPackFormatInfo({
+			minecraftVersion: "1.21",
+		});
+
+		// Clear the cache spy to track subsequent calls
+		vi.clearAllMocks();
+
+		// Second call should return cached result
+		const _result2 = await getPackFormatInfo({
+			minecraftVersion: "1.21",
+		});
+
+		// Verify cache.get was called
+		expect(cache.get).toHaveBeenCalled();
+	});
+
+	it("should handle string decimal pack format", async () => {
+		const result = await getPackFormatInfo({
+			packFormat: "94.1" as unknown as number,
+		});
+
+		const content = JSON.parse(getTextContent(result));
+		expect(content.packFormat).toEqual([94, 1]);
+		expect(content.usesMinMaxFormat).toBe(true);
+	});
+
+	it("should handle string integer pack format", async () => {
+		const result = await getPackFormatInfo({
+			packFormat: "48" as unknown as number,
+		});
+
+		const content = JSON.parse(getTextContent(result));
+		expect(content.packFormat).toBe(48);
+		expect(content.usesMinMaxFormat).toBe(false);
+	});
+
 	it("should normalize version 1.21.0 to 1.21", async () => {
 		const result = await getPackFormatInfo({
 			minecraftVersion: "1.21.0",

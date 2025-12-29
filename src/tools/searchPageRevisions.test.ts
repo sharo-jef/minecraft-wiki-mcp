@@ -106,6 +106,53 @@ describe("searchPageRevisions", () => {
 		expect(content.filtered).toBe(true);
 	});
 
+	it("should throw PageNotFoundError when query.pages is undefined", async () => {
+		const { callMediaWikiAPI } = await import("../api/mediawiki.js");
+		vi.mocked(callMediaWikiAPI).mockResolvedValue({
+			query: {},
+		});
+
+		await expect(
+			searchPageRevisions({
+				title: "NonExistent",
+			}),
+		).rejects.toThrow(PageNotFoundError);
+	});
+
+	it("should throw PageNotFoundError when page is missing", async () => {
+		const { callMediaWikiAPI } = await import("../api/mediawiki.js");
+		vi.mocked(callMediaWikiAPI).mockResolvedValue({
+			query: {
+				pages: {
+					"-1": {
+						missing: true,
+					},
+				},
+			},
+		});
+
+		await expect(
+			searchPageRevisions({
+				title: "NonExistentPage",
+			}),
+		).rejects.toThrow(PageNotFoundError);
+	});
+
+	it("should throw PageNotFoundError when no pages returned", async () => {
+		const { callMediaWikiAPI } = await import("../api/mediawiki.js");
+		vi.mocked(callMediaWikiAPI).mockResolvedValue({
+			query: {
+				pages: {},
+			},
+		});
+
+		await expect(
+			searchPageRevisions({
+				title: "NonExistentPage",
+			}),
+		).rejects.toThrow(PageNotFoundError);
+	});
+
 	it("should support regex pattern matching", async () => {
 		const { callMediaWikiAPI } = await import("../api/mediawiki.js");
 		vi.mocked(callMediaWikiAPI).mockResolvedValue({

@@ -137,6 +137,17 @@ describe("getWikiPage", () => {
 		expect(content.suggestion.nearestRevision).toBe(1000);
 	});
 
+	it("should rethrow non-WikiAPIError when fetching revision", async () => {
+		const { callMediaWikiAPI } = await import("../api/mediawiki.js");
+
+		const error = new Error("Network failure");
+		vi.mocked(callMediaWikiAPI).mockRejectedValue(error);
+
+		await expect(
+			getWikiPage({ title: "Test", revisionId: 999 }),
+		).rejects.toThrow("Network failure");
+	});
+
 	it("should suggest similar pages when page not found", async () => {
 		const { callMediaWikiAPI, searchSimilarPages } = await import(
 			"../api/mediawiki.js"
@@ -263,6 +274,43 @@ describe("getWikiPage", () => {
 		vi.clearAllMocks();
 		await getWikiPage({ title: "Test" });
 		expect(cache.get).toHaveBeenCalled();
+	});
+
+	it("should return cached result directly when cache hit", async () => {
+		const { cache } = await import("../utils/cache.js");
+		const { callMediaWikiAPI } = await import("../api/mediawiki.js");
+
+		const cachedContent = {
+			content: [{ type: "text" as const, text: "cached data" }],
+		};
+
+		vi.mocked(cache.get).mockReturnValueOnce(cachedContent);
+
+		const result = await getWikiPage({ title: "Test" });
+
+		expect(result).toBe(cachedContent);
+		expect(callMediaWikiAPI).not.toHaveBeenCalled();
+
+		vi.mocked(cache.get).mockReturnValue(undefined);
+	});
+
+	it("should suggest similar pages when parse returns empty", async () => {
+		const { callMediaWikiAPI, searchSimilarPages } = await import(
+			"../api/mediawiki.js"
+		);
+
+		vi.mocked(callMediaWikiAPI).mockResolvedValue({});
+		vi.mocked(searchSimilarPages).mockResolvedValue([
+			"Data pack",
+			"Resource pack",
+		]);
+
+		const result = await getWikiPage({ title: "DataPack" });
+
+		const content = JSON.parse(getTextContent(result));
+		expect(content.error).toContain('Page "DataPack" not found');
+		expect(content.suggestions).toContain("Data pack");
+		expect(content.suggestions).toContain("Resource pack");
 	});
 
 	it("should throw error when title is empty", async () => {
