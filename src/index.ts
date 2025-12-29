@@ -25,7 +25,10 @@ const server = new Server(
 			"EXTREMELY IMPORTANT: Your training data may be OUTDATED. Even if a Minecraft version, feature, or item seems to be from the FUTURE or appears NON-EXISTENT in your knowledge, " +
 			"it MAY ACTUALLY EXIST in the version specified in pack.mcmeta. NEVER assume something doesn't exist just because it's beyond your training data cutoff. " +
 			"ALWAYS verify with Wiki tools first. The Wiki is the authoritative source, not your training data. " +
-			"If the user specifies a version or feature you don't recognize, USE THE TOOLS to check the Wiki before claiming it doesn't exist.",
+			"If the user specifies a version or feature you don't recognize, USE THE TOOLS to check the Wiki before claiming it doesn't exist. " +
+			"PACK.MCMETA VERSION FORMAT: When reading pack.mcmeta, the pack_format field can be either a single number (e.g., 48) or an array [major, minor] (e.g., [94, 1] which represents version 94.1). " +
+			"ALWAYS read the existing pack.mcmeta file BEFORE calling get_pack_format_info or create_datapack_structure. DO NOT assume or guess version numbers based on your knowledge. " +
+			"If pack_format is [94, 1], convert it to 94.1 (decimal) when passing to get_pack_format_info. If it's a single number like 48, use it as-is.",
 	},
 	{
 		capabilities: {
@@ -44,8 +47,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 					"Uses version-appropriate pack_format and directory naming (singular for 1.21+, plural for older versions). " +
 					"Returns file contents, JSON schema for pack.mcmeta, and version-specific warnings. " +
 					"Does NOT create actual files or directories - only returns the information needed to create them. " +
-					"REQUIRED: Either minecraftVersion (e.g., '1.21.2', '1.20.5') OR packFormat (e.g., 48, 57), and namespace (e.g., 'my_datapack'). " +
+					"REQUIRED: Either minecraftVersion (e.g., '1.21.2', '1.20.5') OR packFormat (e.g., 48, 57, 94.1), and namespace (e.g., 'my_datapack'). " +
 					"If you only know the pack format number, use packFormat parameter instead of minecraftVersion. " +
+					"IMPORTANT: If updating existing datapack, read pack.mcmeta FIRST to get the current version. Do NOT assume version from your knowledge. " +
+					"PACK FORMAT CONVERSION: If pack.mcmeta contains pack_format as array [A, B] (e.g., [94, 1]), convert to decimal A.B (e.g., 94.1) for packFormat parameter. " +
 					"CRITICAL: Before creating ANY datapack content (recipes, loot tables, advancements, etc.), " +
 					"you MUST verify the exact JSON format for the target version using get_wiki_page. " +
 					"Do NOT rely on assumed knowledge - formats change between versions. Always confirm with Wiki tools. " +
@@ -63,7 +68,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 						packFormat: {
 							type: "number",
 							description:
-								"Pack format number (e.g., 48, 57). Either this or minecraftVersion is required. Use get_pack_format_info to see available formats.",
+								"Pack format number (e.g., 48, 57, 94.1). Can be integer or decimal. " +
+								"If pack.mcmeta has pack_format as array [A, B], convert to decimal A.B (e.g., [94, 1] → 94.1). " +
+								"Either this or minecraftVersion is required. Use get_pack_format_info to see available formats.",
 						},
 						namespace: {
 							type: "string",
@@ -176,22 +183,34 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 				description:
 					"Get pack format information for a specific Minecraft version or pack format number. " +
 					"Returns pack_format, supported Minecraft versions, directory naming convention (singular/plural), " +
-					"and whether min/max format is used.",
+					"and whether min/max format is used. " +
+					"CRITICAL: Before calling this tool, ALWAYS read the existing pack.mcmeta file to get the actual version being used. " +
+					"DO NOT guess or assume version numbers based on your knowledge - versions may be newer than your training data. " +
+					"PACK FORMAT CONVERSION: In pack.mcmeta, pack_format can be: (1) A single number like 48, use it directly as packFormat parameter. " +
+					"(2) An array like [94, 1], convert to decimal 94.1 and pass as packFormat parameter (94.1, not 94). " +
+					'Example: pack.mcmeta has "pack_format": [94, 1] → call this tool with packFormat: 94.1. ' +
+					'Example: pack.mcmeta has "pack_format": 48 → call this tool with packFormat: 48. ' +
+					"If you have a Minecraft version string like '1.21.2', pass it as minecraftVersion parameter instead.",
 				inputSchema: {
 					type: "object",
 					properties: {
 						minecraftVersion: {
 							type: "string",
 							description:
-								"Minecraft version to query (e.g., '1.21.2', '1.20.5')",
+								"Minecraft version to query (e.g., '1.21.2', '1.20.5'). Use this when you have a version string. " +
+								"Either this or packFormat is required, but not both.",
 						},
 						packFormat: {
 							type: "number",
-							description: "Pack format number to query (e.g., 57, 48)",
+							description:
+								"Pack format number to query. Can be integer (e.g., 48, 57) or decimal (e.g., 94.1 for pack_format [94, 1]). " +
+								"Use this when you have pack_format from pack.mcmeta. If pack_format is an array [A, B], convert to decimal A.B. " +
+								"Either this or minecraftVersion is required, but not both.",
 						},
 					},
 				},
 			},
+
 			{
 				name: "search_wiki_page",
 				description:
