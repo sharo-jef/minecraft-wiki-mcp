@@ -21,7 +21,11 @@ const server = new Server(
 		description:
 			"Minecraft Wiki MCP Server: CRITICAL - When working with datapacks, ALWAYS verify specifications using this server's tools, even if you think you know the format. " +
 			"NEVER rely on your training data or assumptions. For non-latest versions, MUST use search_page_revisions and get_wiki_page with revisionId to reference historical specifications. " +
-			"Version-specific formats change frequently - always confirm with Wiki tools before implementing.",
+			"Version-specific formats change frequently - always confirm with Wiki tools before implementing. " +
+			"EXTREMELY IMPORTANT: Your training data may be OUTDATED. Even if a Minecraft version, feature, or item seems to be from the FUTURE or appears NON-EXISTENT in your knowledge, " +
+			"it MAY ACTUALLY EXIST in the version specified in pack.mcmeta. NEVER assume something doesn't exist just because it's beyond your training data cutoff. " +
+			"ALWAYS verify with Wiki tools first. The Wiki is the authoritative source, not your training data. " +
+			"If the user specifies a version or feature you don't recognize, USE THE TOOLS to check the Wiki before claiming it doesn't exist.",
 	},
 	{
 		capabilities: {
@@ -44,7 +48,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 					"If you only know the pack format number, use packFormat parameter instead of minecraftVersion. " +
 					"CRITICAL: Before creating ANY datapack content (recipes, loot tables, advancements, etc.), " +
 					"you MUST verify the exact JSON format for the target version using get_wiki_page. " +
-					"Do NOT rely on assumed knowledge - formats change between versions. Always confirm with Wiki tools.",
+					"Do NOT rely on assumed knowledge - formats change between versions. Always confirm with Wiki tools. " +
+					"EXTREMELY IMPORTANT: Even if the specified Minecraft version appears to be NEWER than your training data or seems NON-EXISTENT, " +
+					"DO NOT refuse or claim it doesn't exist. The version MAY be valid and released after your knowledge cutoff. " +
+					"ALWAYS use get_wiki_page or search_wiki_page tools to verify. Your training data is NOT the source of truth - the Wiki is.",
 				inputSchema: {
 					type: "object",
 					properties: {
@@ -92,7 +99,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 					"Optionally extracts JSON code blocks from the page. Useful for getting JSON format specifications. " +
 					"CRITICAL: ALWAYS use this tool to verify format specifications, even if you believe you know the correct format from training data. " +
 					"For non-latest Minecraft versions, you MUST use search_page_revisions first to find the appropriate historical revision, " +
-					"then use this tool with revisionId parameter. Never assume - always verify with Wiki.",
+					"then use this tool with revisionId parameter. Never assume - always verify with Wiki. " +
+					"EXTREMELY IMPORTANT: If the user asks about a Minecraft version, feature, block, item, or mechanic that seems NEWER than your training data " +
+					"or that you don't recognize, DO NOT claim it doesn't exist. It MAY exist in reality even if it's not in your training data. " +
+					"USE THIS TOOL to search the Wiki and verify. The Wiki contains the latest information, not your training data.",
 				inputSchema: {
 					type: "object",
 					properties: {
