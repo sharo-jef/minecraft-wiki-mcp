@@ -19,16 +19,9 @@ const server = new Server(
 		name: "minecraft-wiki-mcp",
 		version: "1.0.0",
 		description:
-			"Minecraft Wiki MCP Server: CRITICAL - When working with datapacks, ALWAYS verify specifications using this server's tools, even if you think you know the format. " +
-			"NEVER rely on your training data or assumptions. For non-latest versions, MUST use search_page_revisions and get_wiki_page with revisionId to reference historical specifications. " +
-			"Version-specific formats change frequently - always confirm with Wiki tools before implementing. " +
-			"EXTREMELY IMPORTANT: Your training data may be OUTDATED. Even if a Minecraft version, feature, or item seems to be from the FUTURE or appears NON-EXISTENT in your knowledge, " +
-			"it MAY ACTUALLY EXIST in the version specified in pack.mcmeta. NEVER assume something doesn't exist just because it's beyond your training data cutoff. " +
-			"ALWAYS verify with Wiki tools first. The Wiki is the authoritative source, not your training data. " +
-			"If the user specifies a version or feature you don't recognize, USE THE TOOLS to check the Wiki before claiming it doesn't exist. " +
-			"PACK.MCMETA VERSION FORMAT: When reading pack.mcmeta, the pack_format field can be either a single number (e.g., 48) or an array [major, minor] (e.g., [94, 1] which represents version 94.1). " +
-			"ALWAYS read the existing pack.mcmeta file BEFORE calling get_pack_format_info or get_datapack_specification. DO NOT assume or guess version numbers based on your knowledge. " +
-			"If pack_format is [94, 1], convert it to 94.1 (decimal) when passing to get_pack_format_info. If it's a single number like 48, use it as-is.",
+			"Minecraft Wiki MCP Server: REQUIRED WORKFLOW - (1) Read pack.mcmeta FIRST, (2) Call get_pack_format_info to check version, (3) Use other tools as needed. " +
+			"NEVER rely on training data - always verify with Wiki tools. Your knowledge may be outdated; versions/features you don't recognize may exist. " +
+			"PACK FORMAT CONVERSION: pack_format can be a number (48) or array ([94, 1]). Convert arrays to decimal: [94, 1] → 94.1.",
 	},
 	{
 		capabilities: {
