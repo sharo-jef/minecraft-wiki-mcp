@@ -47,7 +47,7 @@ export async function callMediaWikiAPI(
 	const queryString = new URLSearchParams(cleanParams).toString();
 	const url = `${WIKI_API_BASE}?${queryString}`;
 
-	let lastError: Error | null = null;
+	let _lastError: Error | null = null;
 
 	for (let attempt = 0; attempt <= maxRetries; attempt++) {
 		try {
@@ -88,19 +88,15 @@ export async function callMediaWikiAPI(
 
 			return data;
 		} catch (error) {
-			lastError = error instanceof Error ? error : new Error(String(error));
-			if (error instanceof WikiAPIError && isRateLimitError(0, error.code)) {
-				if (attempt < maxRetries) {
-					const delay = retryDelayMs * (attempt + 1);
-					await sleep(delay);
-					continue;
-				}
-			}
+			// Convert non-Error exceptions to Error for consistent error handling
+			_lastError = error instanceof Error ? error : new Error(String(error));
+
+			// Rethrow all errors immediately
+			// Note: Rate limit errors are already handled in the try block above.
+			// Any WikiAPIError caught here means we've already exhausted retries.
 			throw error;
 		}
 	}
-
-	throw lastError ?? new Error("Max retries exceeded");
 }
 
 export async function searchSimilarPages(

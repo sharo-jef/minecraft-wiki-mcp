@@ -196,6 +196,27 @@ describe("mediawiki", () => {
 			const callUrl = vi.mocked(fetch).mock.calls[0][0] as string;
 			expect(callUrl).toContain("redirects=true");
 		});
+
+		it("should throw non-WikiAPIError errors", async () => {
+			const error = new Error("Network error");
+			vi.mocked(fetch).mockRejectedValue(error);
+
+			await expect(callMediaWikiAPI({ action: "query" })).rejects.toThrow(
+				"Network error",
+			);
+		});
+
+		it("should convert non-Error exceptions to Error in lastError", async () => {
+			vi.mocked(fetch).mockRejectedValue("string error");
+
+			try {
+				await callMediaWikiAPI({ action: "query" });
+				expect.fail("Should have thrown");
+			} catch (error) {
+				// Original error is thrown, but lastError is converted internally
+				expect(error).toBe("string error");
+			}
+		});
 	});
 
 	describe("searchSimilarPages", () => {
