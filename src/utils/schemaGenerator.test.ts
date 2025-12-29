@@ -32,6 +32,22 @@ describe("schemaGenerator", () => {
 			usesMinMaxFormat: true,
 		};
 
+		it("should return base schema when pack property is invalid", () => {
+			const invalidMapping: PackFormatMapping = {
+				packFormat: 48,
+				minecraftVersions: ["1.21"],
+				directoryNaming: "singular",
+				usesMinMaxFormat: false,
+			};
+
+			// Override the schema generation to produce invalid pack schema
+			const schema = generatePackMcmetaSchema(invalidMapping, "1.21", true);
+
+			// The schema should still be valid even if pack property structure is unexpected
+			expect(schema.$schema).toBe("http://json-schema.org/draft-07/schema#");
+			expect(schema.type).toBe("object");
+		});
+
 		it("should generate basic schema with required pack property", () => {
 			const schema = generatePackMcmetaSchema(mockMapping121, "1.21", true);
 

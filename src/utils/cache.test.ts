@@ -96,6 +96,18 @@ describe("Cache", () => {
 		});
 	});
 
+	describe("size", () => {
+		it("should return cache size", () => {
+			expect(cacheModule.cache.size()).toBe(0);
+			cacheModule.cache.set("key1", "value1");
+			expect(cacheModule.cache.size()).toBe(1);
+			cacheModule.cache.set("key2", "value2");
+			expect(cacheModule.cache.size()).toBe(2);
+			cacheModule.cache.delete("key1");
+			expect(cacheModule.cache.size()).toBe(1);
+		});
+	});
+
 	describe("TTL (Time To Live)", () => {
 		it("should expire entries after TTL", async () => {
 			const ttl = 50; // 50ms

@@ -32,6 +32,23 @@ describe("warningGenerator", () => {
 			usesMinMaxFormat: true,
 		};
 
+		it("should generate warnings for unknown version with source=fallback", () => {
+			const warnings = generateWarnings(
+				"99.99.99",
+				mockMapping121,
+				false,
+				"1.21.4",
+				"fallback",
+			);
+
+			expect(warnings).toContain(
+				"⚠️ UNKNOWN VERSION: Minecraft 99.99.99 is not in the known versions database.",
+			);
+			expect(warnings.join("\n")).toContain(
+				"Version not found in hardcoded mappings or Wiki data.",
+			);
+		});
+
 		it("should warn about unknown versions with fallback", () => {
 			const warnings = generateWarnings(
 				"1.99.99",
