@@ -18,6 +18,10 @@ const server = new Server(
 	{
 		name: "minecraft-wiki-mcp",
 		version: "1.0.0",
+		description:
+			"Minecraft Wiki MCP Server: CRITICAL - When working with datapacks, ALWAYS verify specifications using this server's tools, even if you think you know the format. " +
+			"NEVER rely on your training data or assumptions. For non-latest versions, MUST use search_page_revisions and get_wiki_page with revisionId to reference historical specifications. " +
+			"Version-specific formats change frequently - always confirm with Wiki tools before implementing.",
 	},
 	{
 		capabilities: {
@@ -32,11 +36,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 			{
 				name: "create_datapack_structure",
 				description:
-					"Generate pack.mcmeta and correct directory structure for a specific Minecraft version or pack format. " +
+					"Provide pack.mcmeta file contents, directory structure information, and JSON schema for a specific Minecraft version or pack format. " +
 					"Uses version-appropriate pack_format and directory naming (singular for 1.21+, plural for older versions). " +
 					"Returns file contents, JSON schema for pack.mcmeta, and version-specific warnings. " +
+					"Does NOT create actual files or directories - only returns the information needed to create them. " +
 					"REQUIRED: Either minecraftVersion (e.g., '1.21.2', '1.20.5') OR packFormat (e.g., 48, 57), and namespace (e.g., 'my_datapack'). " +
-					"If you only know the pack format number, use packFormat parameter instead of minecraftVersion.",
+					"If you only know the pack format number, use packFormat parameter instead of minecraftVersion. " +
+					"CRITICAL: Before creating ANY datapack content (recipes, loot tables, advancements, etc.), " +
+					"you MUST verify the exact JSON format for the target version using get_wiki_page. " +
+					"Do NOT rely on assumed knowledge - formats change between versions. Always confirm with Wiki tools.",
 				inputSchema: {
 					type: "object",
 					properties: {
@@ -81,7 +89,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 					"Get Minecraft Wiki page content. " +
 					"IMPORTANT: Requires exact page title. Use search_wiki_page first to find the correct page title. " +
 					"Can retrieve the latest version or a specific revision. " +
-					"Optionally extracts JSON code blocks from the page. Useful for getting JSON format specifications.",
+					"Optionally extracts JSON code blocks from the page. Useful for getting JSON format specifications. " +
+					"CRITICAL: ALWAYS use this tool to verify format specifications, even if you believe you know the correct format from training data. " +
+					"For non-latest Minecraft versions, you MUST use search_page_revisions first to find the appropriate historical revision, " +
+					"then use this tool with revisionId parameter. Never assume - always verify with Wiki.",
 				inputSchema: {
 					type: "object",
 					properties: {
