@@ -138,4 +138,33 @@ describe("getPackFormatInfo", () => {
 		await getPackFormatInfo({ minecraftVersion: "1.21.2" });
 		expect(cache.get).toHaveBeenCalled();
 	});
+
+	it("should handle decimal pack format (e.g., 94.1 -> [94, 1])", async () => {
+		const result = await getPackFormatInfo({
+			packFormat: 94.1,
+		});
+
+		const content = JSON.parse(getTextContent(result));
+		expect(content.packFormat).toEqual([94, 1]);
+		expect(content.minecraftVersions).toContain("1.21.11");
+		expect(content.usesMinMaxFormat).toBe(true);
+	});
+
+	it("should handle string pack format representations", async () => {
+		// Test array string format
+		const result1 = await getPackFormatInfo({
+			packFormat: "[88, 0]",
+		});
+		const content1 = JSON.parse(getTextContent(result1));
+		expect(content1.packFormat).toEqual([88, 0]);
+		expect(content1.minecraftVersions).toContain("1.21.9");
+
+		// Test decimal string format
+		const result2 = await getPackFormatInfo({
+			packFormat: "94.1",
+		});
+		const content2 = JSON.parse(getTextContent(result2));
+		expect(content2.packFormat).toEqual([94, 1]);
+		expect(content2.minecraftVersions).toContain("1.21.11");
+	});
 });

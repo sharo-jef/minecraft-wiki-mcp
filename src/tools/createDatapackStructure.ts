@@ -11,6 +11,45 @@ import {
 } from "../utils/versionMapping.js";
 import { generateWarnings } from "../utils/warningGenerator.js";
 
+/**
+ * Compare two pack formats for equality.
+ * Handles comparisons between:
+ * - number and number
+ * - number and [number, number]
+ * - decimal number (e.g., 94.1) and [number, number] (e.g., [94, 1])
+ */
+function comparePackFormats(
+	format1: number | [number, number],
+	format2: number | [number, number],
+): boolean {
+	// Normalize both formats - handle decimal representation
+	const normalize = (
+		fmt: number | [number, number],
+	): [number, number] | number => {
+		if (typeof fmt === "number") {
+			const intPart = Math.floor(fmt);
+			const decimalPart = Math.round((fmt - intPart) * 10);
+			if (decimalPart > 0) {
+				return [intPart, decimalPart];
+			}
+			return intPart;
+		}
+		return fmt;
+	};
+
+	const norm1 = normalize(format1);
+	const norm2 = normalize(format2);
+
+	// Compare
+	if (Array.isArray(norm1) && Array.isArray(norm2)) {
+		return norm1[0] === norm2[0] && norm1[1] === norm2[1];
+	}
+	if (!Array.isArray(norm1) && !Array.isArray(norm2)) {
+		return norm1 === norm2;
+	}
+	return false;
+}
+
 interface CreateDatapackStructureArgs {
 	minecraftVersion?: string;
 	packFormat?: number;
@@ -50,8 +89,8 @@ export async function createDatapackStructure(
 	// Determine minecraft version from packFormat if needed
 	let resolvedMinecraftVersion = minecraftVersion;
 	if (!resolvedMinecraftVersion && packFormat) {
-		const packFormatMapping = KNOWN_PACK_FORMATS.find(
-			(pf) => pf.packFormat === packFormat,
+		const packFormatMapping = KNOWN_PACK_FORMATS.find((pf) =>
+			comparePackFormats(pf.packFormat, packFormat),
 		);
 		if (!packFormatMapping) {
 			throw new Error(

@@ -305,4 +305,31 @@ describe("createDatapackStructure", () => {
 		// Should use default features: ["functions"]
 		expect(result.content).toHaveLength(1);
 	});
+
+	it("should handle decimal pack format (e.g., 94.1 -> [94, 1])", async () => {
+		const { getPackFormatWithFallback } = await import(
+			"../utils/versionMapping.js"
+		);
+		const mockMapping: PackFormatMapping = {
+			packFormat: [94, 1],
+			minecraftVersions: ["1.21.11"],
+			directoryNaming: "singular",
+			usesMinMaxFormat: true,
+		};
+		vi.mocked(getPackFormatWithFallback).mockResolvedValue({
+			mapping: mockMapping,
+			isKnown: true,
+			normalizedVersion: "1.21.11",
+			source: "hardcoded",
+		});
+
+		const result = await createDatapackStructure({
+			packFormat: 94.1,
+			namespace: "test",
+		});
+
+		expect(getPackFormatWithFallback).toHaveBeenCalledWith("1.21.11");
+		const content = JSON.parse(getTextContent(result));
+		expect(content.packMcmetaSchema).toBeDefined();
+	});
 });
