@@ -37,7 +37,8 @@
 	"homepage": "https://github.com/sharo-jef/minecraft-wiki-mcp#readme",
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.25.1",
-		"cheerio": "^1.1.2"
+		"cheerio": "^1.1.2",
+		"zod": "^4.2.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.10",

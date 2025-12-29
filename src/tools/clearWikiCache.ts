@@ -5,14 +5,14 @@ import { clearWikiCache as clearCache } from "../utils/versionMapping.js";
  * Use when cached data might be stale or for debugging
  */
 export async function clearWikiCache(): Promise<{
-	content: Array<{ type: string; text: string }>;
+	content: Array<{ type: "text"; text: string }>;
 }> {
 	clearCache();
 
 	return {
 		content: [
 			{
-				type: "text",
+				type: "text" as const,
 				text: "Wiki pack format cache has been cleared successfully. The cache will be rebuilt on the next Wiki query.",
 			},
 		],
