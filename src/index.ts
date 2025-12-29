@@ -8,7 +8,7 @@ import {
 
 import { clearWikiCache } from "./tools/clearWikiCache.js";
 import { compareVersions } from "./tools/compareVersions.js";
-import { createDatapackStructure } from "./tools/createDatapackStructure.js";
+import { getDatapackSpecification } from "./tools/getDatapackSpecification.js";
 import { getPackFormatInfo } from "./tools/getPackFormatInfo.js";
 import { getWikiPage } from "./tools/getWikiPage.js";
 import { searchPageRevisions } from "./tools/searchPageRevisions.js";
@@ -27,7 +27,7 @@ const server = new Server(
 			"ALWAYS verify with Wiki tools first. The Wiki is the authoritative source, not your training data. " +
 			"If the user specifies a version or feature you don't recognize, USE THE TOOLS to check the Wiki before claiming it doesn't exist. " +
 			"PACK.MCMETA VERSION FORMAT: When reading pack.mcmeta, the pack_format field can be either a single number (e.g., 48) or an array [major, minor] (e.g., [94, 1] which represents version 94.1). " +
-			"ALWAYS read the existing pack.mcmeta file BEFORE calling get_pack_format_info or create_datapack_structure. DO NOT assume or guess version numbers based on your knowledge. " +
+			"ALWAYS read the existing pack.mcmeta file BEFORE calling get_pack_format_info or get_datapack_specification. DO NOT assume or guess version numbers based on your knowledge. " +
 			"If pack_format is [94, 1], convert it to 94.1 (decimal) when passing to get_pack_format_info. If it's a single number like 48, use it as-is.",
 	},
 	{
@@ -41,16 +41,20 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 	return {
 		tools: [
 			{
-				name: "create_datapack_structure",
+				name: "get_datapack_specification",
 				description:
-					"Provide pack.mcmeta file contents, directory structure information, and JSON schema for a specific Minecraft version or pack format. " +
-					"Uses version-appropriate pack_format and directory naming (singular for 1.21+, plural for older versions). " +
-					"Returns file contents, JSON schema for pack.mcmeta, and version-specific warnings. " +
-					"Does NOT create actual files or directories - only returns the information needed to create them. " +
+					"⚠️ ESSENTIAL for datapack creation AND migration: Provides complete pack.mcmeta format, directory structure, and JSON schema validation. " +
+					"This is the AUTHORITATIVE tool for understanding version-specific requirements - NOT just for new datapacks. " +
+					"USE CASES: (1) Creating new datapacks, (2) Migrating existing datapacks to new versions, (3) Understanding version-specific format requirements. " +
+					"CRITICAL FOR MIGRATION: When updating a datapack to a new Minecraft version, ALWAYS call this tool to understand format changes, new schema requirements, and directory structure updates. " +
+					"Simply changing pack_format in pack.mcmeta is NOT sufficient - formats, schemas, and requirements change between versions. " +
+					"Returns: Complete pack.mcmeta file contents with correct schema, directory structure (singular for 1.21+, plural for older), and version-specific warnings. " +
+					"Does NOT create actual files - only returns information needed to create/update them. " +
 					"REQUIRED: Either minecraftVersion (e.g., '1.21.2', '1.20.5') OR packFormat (e.g., 48, 57, 94.1), and namespace (e.g., 'my_datapack'). " +
 					"If you only know the pack format number, use packFormat parameter instead of minecraftVersion. " +
 					"IMPORTANT: If updating existing datapack, read pack.mcmeta FIRST to get the current version. Do NOT assume version from your knowledge. " +
 					"PACK FORMAT CONVERSION: If pack.mcmeta contains pack_format as array [A, B] (e.g., [94, 1]), convert to decimal A.B (e.g., 94.1) for packFormat parameter. " +
+					"WORKFLOW: For migration, use this AFTER get_pack_format_info (which only returns low-level version numbers) to understand complete format requirements. " +
 					"CRITICAL: Before creating ANY datapack content (recipes, loot tables, advancements, etc.), " +
 					"you MUST verify the exact JSON format for the target version using get_wiki_page. " +
 					"Do NOT rely on assumed knowledge - formats change between versions. Always confirm with Wiki tools. " +
@@ -184,6 +188,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 					"Get pack format information for a specific Minecraft version or pack format number. " +
 					"Returns pack_format, supported Minecraft versions, directory naming convention (singular/plural), " +
 					"and whether min/max format is used. " +
+					"⚠️ IMPORTANT: This tool provides LOW-LEVEL version information ONLY. " +
+					"To get complete pack.mcmeta format, schema, and directory structure, you MUST call get_datapack_specification afterward. " +
+					"For large version migrations (e.g., pack_format 10 → 94+), STRONGLY RECOMMEND using compare_versions tool to identify breaking changes. " +
+					"WORKFLOW for migration: (1) Read existing pack.mcmeta, (2) Call this tool to check new version info, " +
+					"(3) For major jumps, call compare_versions to see what changed, (4) Call get_datapack_specification for complete format. " +
 					"CRITICAL: Before calling this tool, ALWAYS read the existing pack.mcmeta file to get the actual version being used. " +
 					"DO NOT guess or assume version numbers based on your knowledge - versions may be newer than your training data. " +
 					"PACK FORMAT CONVERSION: In pack.mcmeta, pack_format can be: (1) A single number like 48, use it directly as packFormat parameter. " +
@@ -243,7 +252,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 					"Compare JSON format changes between two Minecraft versions on a Wiki page. " +
 					"IMPORTANT: Requires exact page title. Use search_wiki_page first to find the correct page title. " +
 					"Searches page revisions for version-related edits, retrieves content from both versions, " +
-					"and generates a diff of JSON blocks. Useful for understanding format changes during version migrations.",
+					"and generates a diff of JSON blocks. Useful for understanding format changes during version migrations. " +
+					"⚠️ STRONGLY RECOMMENDED for large version jumps (e.g., pack_format 10 → 94+): " +
+					"Major version jumps often introduce significant format changes, new required fields, deprecated features, and schema updates. " +
+					"Use this tool to identify all changes before migration to avoid breaking your datapack. " +
+					"TYPICAL WORKFLOW: (1) get_pack_format_info to check version numbers, " +
+					"(2) compare_versions to see what changed (especially for major jumps), " +
+					"(3) get_datapack_specification to get complete schema and format requirements.",
 				inputSchema: {
 					type: "object",
 					properties: {
@@ -287,8 +302,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 	try {
 		switch (name) {
-			case "create_datapack_structure":
-				return await createDatapackStructure(
+			case "get_datapack_specification":
+				return await getDatapackSpecification(
 					args as {
 						minecraftVersion: string;
 						namespace: string;

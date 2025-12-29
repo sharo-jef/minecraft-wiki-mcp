@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getTextContent } from "../test-utils.js";
 import type { PackFormatMapping } from "../types.js";
-import { createDatapackStructure } from "./createDatapackStructure.js";
+import { getDatapackSpecification } from "./getDatapackSpecification.js";
 
 // Mock dependencies
 vi.mock("../utils/versionMapping.js", async () => {
@@ -14,7 +14,7 @@ vi.mock("../utils/versionMapping.js", async () => {
 	};
 });
 
-describe("createDatapackStructure", () => {
+describe("getDatapackSpecification", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
@@ -35,7 +35,7 @@ describe("createDatapackStructure", () => {
 
 	it("should require namespace", async () => {
 		await expect(
-			createDatapackStructure({
+			getDatapackSpecification({
 				minecraftVersion: "1.21",
 				namespace: "",
 			}),
@@ -44,7 +44,7 @@ describe("createDatapackStructure", () => {
 
 	it("should require either minecraftVersion or packFormat", async () => {
 		await expect(
-			createDatapackStructure({
+			getDatapackSpecification({
 				namespace: "test",
 			}),
 		).rejects.toThrow("Either minecraftVersion or packFormat is required");
@@ -52,14 +52,14 @@ describe("createDatapackStructure", () => {
 
 	it("should validate namespace format", async () => {
 		await expect(
-			createDatapackStructure({
+			getDatapackSpecification({
 				minecraftVersion: "1.21",
 				namespace: "Invalid_Namespace!",
 			}),
 		).rejects.toThrow("namespace must contain only lowercase letters");
 
 		await expect(
-			createDatapackStructure({
+			getDatapackSpecification({
 				minecraftVersion: "1.21",
 				namespace: "Test",
 			}),
@@ -87,7 +87,7 @@ describe("createDatapackStructure", () => {
 
 		for (const namespace of validNamespaces) {
 			await expect(
-				createDatapackStructure({
+				getDatapackSpecification({
 					minecraftVersion: "1.21",
 					namespace,
 				}),
@@ -106,7 +106,7 @@ describe("createDatapackStructure", () => {
 			source: "hardcoded",
 		});
 
-		const result = await createDatapackStructure({
+		const result = await getDatapackSpecification({
 			minecraftVersion: "1.21",
 			namespace: "my_pack",
 			description: "Test Pack",
@@ -131,7 +131,7 @@ describe("createDatapackStructure", () => {
 			source: "hardcoded",
 		});
 
-		const result = await createDatapackStructure({
+		const result = await getDatapackSpecification({
 			minecraftVersion: "1.21.9",
 			namespace: "test",
 		});
@@ -153,7 +153,7 @@ describe("createDatapackStructure", () => {
 			source: "hardcoded",
 		});
 
-		const result = await createDatapackStructure({
+		const result = await getDatapackSpecification({
 			minecraftVersion: "1.21",
 			namespace: "my_pack",
 			description: "My Pack",
@@ -181,7 +181,7 @@ describe("createDatapackStructure", () => {
 			source: "hardcoded",
 		});
 
-		const result = await createDatapackStructure({
+		const result = await getDatapackSpecification({
 			minecraftVersion: "1.21",
 			namespace: "test",
 		});
@@ -204,7 +204,7 @@ describe("createDatapackStructure", () => {
 			source: "hardcoded",
 		});
 
-		const result = await createDatapackStructure({
+		const result = await getDatapackSpecification({
 			minecraftVersion: "1.21",
 			namespace: "test",
 		});
@@ -226,7 +226,7 @@ describe("createDatapackStructure", () => {
 			source: "fallback",
 		});
 
-		const result = await createDatapackStructure({
+		const result = await getDatapackSpecification({
 			minecraftVersion: "1.99.99",
 			namespace: "test",
 		});
@@ -247,7 +247,7 @@ describe("createDatapackStructure", () => {
 			source: "hardcoded",
 		});
 
-		const _result = await createDatapackStructure({
+		const _result = await getDatapackSpecification({
 			packFormat: 48,
 			namespace: "test",
 		});
@@ -257,7 +257,7 @@ describe("createDatapackStructure", () => {
 
 	it("should throw error for unknown packFormat", async () => {
 		await expect(
-			createDatapackStructure({
+			getDatapackSpecification({
 				packFormat: 9999,
 				namespace: "test",
 			}),
@@ -275,7 +275,7 @@ describe("createDatapackStructure", () => {
 			source: "hardcoded",
 		});
 
-		const result = await createDatapackStructure({
+		const result = await getDatapackSpecification({
 			minecraftVersion: "1.21",
 			namespace: "test",
 			features: ["functions", "recipes", "loot_tables"],
@@ -297,7 +297,7 @@ describe("createDatapackStructure", () => {
 			source: "hardcoded",
 		});
 
-		const result = await createDatapackStructure({
+		const result = await getDatapackSpecification({
 			minecraftVersion: "1.21",
 			namespace: "test",
 		});
@@ -323,7 +323,7 @@ describe("createDatapackStructure", () => {
 			source: "hardcoded",
 		});
 
-		const result = await createDatapackStructure({
+		const result = await getDatapackSpecification({
 			packFormat: 94.1,
 			namespace: "test",
 		});

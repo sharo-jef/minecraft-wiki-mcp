@@ -8,11 +8,11 @@ import { getTextContent } from "./test-utils.js";
 describe("MCP Tools Integration", () => {
 	describe("Datapack creation workflow", () => {
 		it("should create datapack for known version using minecraftVersion", async () => {
-			const { createDatapackStructure } = await import(
-				"./tools/createDatapackStructure.js"
+			const { getDatapackSpecification } = await import(
+				"./tools/getDatapackSpecification.js"
 			);
 
-			const result = await createDatapackStructure({
+			const result = await getDatapackSpecification({
 				minecraftVersion: "1.21.2",
 				namespace: "my_pack",
 				description: "Test Pack",
@@ -34,11 +34,11 @@ describe("MCP Tools Integration", () => {
 		});
 
 		it("should create datapack using packFormat", async () => {
-			const { createDatapackStructure } = await import(
-				"./tools/createDatapackStructure.js"
+			const { getDatapackSpecification } = await import(
+				"./tools/getDatapackSpecification.js"
 			);
 
-			const result = await createDatapackStructure({
+			const result = await getDatapackSpecification({
 				packFormat: 48,
 				namespace: "test_pack",
 			});
@@ -48,11 +48,11 @@ describe("MCP Tools Integration", () => {
 		});
 
 		it("should create datapack with load setup", async () => {
-			const { createDatapackStructure } = await import(
-				"./tools/createDatapackStructure.js"
+			const { getDatapackSpecification } = await import(
+				"./tools/getDatapackSpecification.js"
 			);
 
-			const result = await createDatapackStructure({
+			const result = await getDatapackSpecification({
 				minecraftVersion: "1.21",
 				namespace: "my_pack",
 				features: ["functions"],

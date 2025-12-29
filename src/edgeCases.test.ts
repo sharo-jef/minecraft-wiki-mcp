@@ -54,12 +54,12 @@ describe("Edge Cases", () => {
 
 	describe("Namespace validation edge cases", () => {
 		it("should reject uppercase letters", async () => {
-			const { createDatapackStructure } = await import(
-				"./tools/createDatapackStructure.js"
+			const { getDatapackSpecification } = await import(
+				"./tools/getDatapackSpecification.js"
 			);
 
 			await expect(
-				createDatapackStructure({
+				getDatapackSpecification({
 					minecraftVersion: "1.21",
 					namespace: "MyPack",
 				}),
@@ -67,26 +67,26 @@ describe("Edge Cases", () => {
 		});
 
 		it("should reject special characters except allowed ones", async () => {
-			const { createDatapackStructure } = await import(
-				"./tools/createDatapackStructure.js"
+			const { getDatapackSpecification } = await import(
+				"./tools/getDatapackSpecification.js"
 			);
 
 			await expect(
-				createDatapackStructure({
+				getDatapackSpecification({
 					minecraftVersion: "1.21",
 					namespace: "my@pack",
 				}),
 			).rejects.toThrow();
 
 			await expect(
-				createDatapackStructure({
+				getDatapackSpecification({
 					minecraftVersion: "1.21",
 					namespace: "my pack",
 				}),
 			).rejects.toThrow();
 
 			await expect(
-				createDatapackStructure({
+				getDatapackSpecification({
 					minecraftVersion: "1.21",
 					namespace: "my/pack",
 				}),
@@ -94,8 +94,8 @@ describe("Edge Cases", () => {
 		});
 
 		it("should accept all valid characters", async () => {
-			const { createDatapackStructure } = await import(
-				"./tools/createDatapackStructure.js"
+			const { getDatapackSpecification } = await import(
+				"./tools/getDatapackSpecification.js"
 			);
 
 			// These should all work
@@ -112,7 +112,7 @@ describe("Edge Cases", () => {
 
 			for (const namespace of validNames) {
 				await expect(
-					createDatapackStructure({
+					getDatapackSpecification({
 						minecraftVersion: "1.21",
 						namespace,
 					}),
@@ -347,12 +347,12 @@ describe("Edge Cases", () => {
 		});
 
 		it("should handle very long namespace", async () => {
-			const { createDatapackStructure } = await import(
-				"./tools/createDatapackStructure.js"
+			const { getDatapackSpecification } = await import(
+				"./tools/getDatapackSpecification.js"
 			);
 
 			const longName = "a".repeat(100);
-			const result = await createDatapackStructure({
+			const result = await getDatapackSpecification({
 				minecraftVersion: "1.21",
 				namespace: longName,
 			});
@@ -361,12 +361,12 @@ describe("Edge Cases", () => {
 		});
 
 		it("should handle very long description", async () => {
-			const { createDatapackStructure } = await import(
-				"./tools/createDatapackStructure.js"
+			const { getDatapackSpecification } = await import(
+				"./tools/getDatapackSpecification.js"
 			);
 
 			const longDesc = "A very long description ".repeat(100);
-			const result = await createDatapackStructure({
+			const result = await getDatapackSpecification({
 				minecraftVersion: "1.21",
 				namespace: "test",
 				description: longDesc,

@@ -50,7 +50,7 @@ function comparePackFormats(
 	return false;
 }
 
-interface CreateDatapackStructureArgs {
+interface GetDatapackSpecificationArgs {
 	minecraftVersion?: string;
 	packFormat?: number;
 	namespace: string;
@@ -59,8 +59,8 @@ interface CreateDatapackStructureArgs {
 	includeLoadSetup?: boolean;
 }
 
-export async function createDatapackStructure(
-	args: CreateDatapackStructureArgs,
+export async function getDatapackSpecification(
+	args: GetDatapackSpecificationArgs,
 ): Promise<CallToolResult> {
 	const {
 		minecraftVersion,
